@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CMS.Api/CMS.Api.csproj" />
+  <Project Path="CMS.Models/CMS.Models.csproj" />
+  <Project Path="CMS.Repository/CMS.Repository.csproj" />
+  <Project Path="CMS.Services/CMS.Services.csproj" />
+</Solution>
