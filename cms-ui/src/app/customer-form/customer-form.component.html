@@ -1,0 +1,59 @@
+<section class="customer-form-page">
+  <div class="page-header">
+    <div>
+      <h2>{{ mode === 'create' ? 'Create Customer' : mode === 'edit' ? 'Update Customer' : 'Customer Details' }}</h2>
+      <p>{{ mode === 'view' ? 'View customer information' : 'Fill in the details below' }}</p>
+    </div>
+
+    <button type="button" class="secondary-btn" (click)="cancel()">
+      Back to list
+    </button>
+  </div>
+
+  <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-form">
+    <div class="field-grid">
+      <div class="field">
+        <label for="firstName">First Name</label>
+        <input id="firstName" type="text" formControlName="firstName" [attr.disabled]="mode === 'view' ? true : null" />
+        <small *ngIf="customerForm.get('firstName')?.touched && customerForm.get('firstName')?.invalid">
+          First name is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="lastName">Last Name</label>
+        <input id="lastName" type="text" formControlName="lastName" [attr.disabled]="mode === 'view' ? true : null" />
+        <small *ngIf="customerForm.get('lastName')?.touched && customerForm.get('lastName')?.invalid">
+          Last name is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="middleName">Middle Name</label>
+        <input id="middleName" type="text" formControlName="middleName" [attr.disabled]="mode === 'view' ? true : null" />
+      </div>
+
+      <div class="field">
+        <label for="dob">Date of Birth</label>
+        <input id="dob" type="datetime-local" formControlName="dob" [attr.disabled]="mode === 'view' ? true : null" />
+        <small *ngIf="customerForm.get('dob')?.touched && customerForm.get('dob')?.invalid">
+          Date of birth is required.
+        </small>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button *ngIf="mode !== 'view'" type="submit" class="primary-btn" [disabled]="isSaving || customerForm.invalid">
+        {{ isSaving ? 'Saving...' : mode === 'edit' ? 'Update Customer' : 'Create Customer' }}
+      </button>
+
+      <button *ngIf="mode === 'view'" type="button" class="primary-btn" (click)="markEditable()">
+        Edit Customer
+      </button>
+
+      <button type="button" class="secondary-btn" (click)="cancel()">
+        {{ mode === 'view' ? 'Close' : 'Cancel' }}
+      </button>
+    </div>
+  </form>
+</section>

@@ -28,6 +28,50 @@ namespace CMS.Api.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerModel), Description = "Returns a customer")]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(StatusCodeResult), Description = "Returns an error status code")]
+        public IActionResult GetCustomer([FromRoute] int id)
+        {
+            try
+            {
+                var customer = customerService.SearchCustomer(customer=>customer.Id == id);
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+                return Ok(customer);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while retrieving the customer.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateCustomer([FromRoute] int id, [FromBody] CustomerModel customerModel)
+        {
+            try
+            {
+                var existingCustomer = customerService.SearchCustomer(customer => customer.Id == id);
+                if (existingCustomer == null)
+                {
+                    return NotFound();
+                }
+                existingCustomer.FirstName = customerModel.FirstName;
+                existingCustomer.LastName = customerModel.LastName;
+                existingCustomer.MiddleName = customerModel.MiddleName;
+                existingCustomer.Dob = customerModel.Dob;
+                var updatedCustomer = customerService.UpdateCustomer(existingCustomer);
+                return Ok(updatedCustomer);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while updating the customer.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
+        }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CustomerModel), Description = "Returns the created customer")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(StatusCodeResult), Description = "Returns an error status code")]

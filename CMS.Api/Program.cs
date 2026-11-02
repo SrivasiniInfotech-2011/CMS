@@ -41,7 +41,15 @@ if (secretKey.Length < 32)
 {
     throw new InvalidOperationException("JwtSettings:SecretKey must contain at least 32 decoded bytes for HMAC-SHA256.");
 }
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -96,7 +104,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "CMS API V1");
     c.RoutePrefix = string.Empty;
 });
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

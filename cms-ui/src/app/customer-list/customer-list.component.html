@@ -1,0 +1,111 @@
+<section class="customer-list-page">
+  <div class="page-header">
+    <div>
+      <h2>Customers</h2>
+      <p>Manage customer records</p>
+    </div>
+
+    <button type="button" class="primary-btn" (click)="openCreateForm()">
+      Create Customer
+    </button>
+  </div>
+
+  <div *ngIf="!showForm">
+    <div *ngIf="customers.length === 0" class="empty-state">
+      No customers found.
+    </div>
+
+    <div *ngIf="customers.length > 0" class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Middle Name</th>
+            <th>Date of Birth</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (customer of paginatedCustomers; track $index) {
+            <tr>
+              <td>{{ customer.firstName || "—" }}</td>
+              <td>{{ customer.lastName || "—" }}</td>
+              <td>{{ customer.middleName || "—" }}</td>
+              <td>
+                {{ customer.dob ? (customer.dob | date: "mediumDate") : "—" }}
+              </td>
+              <td class="actions">
+                <button
+                  type="button"
+                  class="secondary-btn"
+                  (click)="openViewForm(customer)"
+                >
+                  View
+                </button>
+                <button
+                  type="button"
+                  class="secondary-btn"
+                  (click)="openEditForm(customer)"
+                >
+                  Update
+                </button>
+              </td>
+            </tr>
+          }
+          <!-- <tr *ngFor="let customer of paginatedCustomers">
+            <td>{{customer.firstName || '—'}}</td>
+            <td>{{ customer.lastName || '—' }}</td>
+            <td>{{ customer.middleName || '—' }}</td>
+            <td>{{ customer.dob ? (customer.dob | date: 'mediumDate') : '—' }}</td>
+            <td class="actions">
+              <button type="button" class="secondary-btn" (click)="openViewForm(customer)">
+                View
+              </button>
+              <button type="button" class="secondary-btn" (click)="openEditForm(customer)">
+                Update
+              </button>
+            </td>
+          </tr> -->
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="pages.length > 1" class="pagination">
+      <button
+        type="button"
+        [disabled]="currentPage === 1"
+        (click)="goToPage(currentPage - 1)"
+      >
+        Previous
+      </button>
+
+      <button
+        *ngFor="let pageNumber of pages"
+        type="button"
+        class="page-number"
+        [class.active]="pageNumber === currentPage"
+        (click)="goToPage(pageNumber)"
+      >
+        {{ pageNumber }}
+      </button>
+
+      <button
+        type="button"
+        [disabled]="currentPage === totalPages"
+        (click)="goToPage(currentPage + 1)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+
+  <app-customer-form
+    *ngIf="showForm"
+    [customer]="currentCustomer"
+    [mode]="formMode"
+    (saved)="closeForm()"
+    (cancelled)="closeForm()"
+  ></app-customer-form>
+</section>
