@@ -16,7 +16,7 @@ export interface Customer {
 export class CustomerService {
   private readonly apiUrl = 'https://localhost:7232/api/Customer';
   private readonly authToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzkzNjMyNTE1LCJleHAiOjE3OTM2MzYxMTUsImlhdCI6MTc5MzYzMjUxNSwiaXNzIjoiQ01TIiwiYXVkIjoiQ01TLUFwaSJ9.qccqLqWSPRwZiZd-ZBeq2LPcap64ogUjc1a-G_7fPcI';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzkzNzEwMzgxLCJleHAiOjE3OTM3MTM5ODEsImlhdCI6MTc5MzcxMDM4MSwiaXNzIjoiQ01TIiwiYXVkIjoiQ01TLUFwaSJ9._PqShkBwgE63muXnHgXyuVxCmdqsL0JGDMo4G6vXPC4';
 
   constructor(private readonly http: HttpClient) {}
 

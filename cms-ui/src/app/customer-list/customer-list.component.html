@@ -11,6 +11,53 @@
   </div>
 
   <div *ngIf="!showForm">
+    <section class="rxjs-demo">
+      <div class="demo-header">
+        <div>
+          <h3>RxJS realtime examples</h3>
+          <p>Examples for Subject, BehaviorSubject and ReplaySubject.</p>
+        </div>
+        <button type="button" class="secondary-btn" (click)="clearRealtimeLogs()">
+          Clear logs
+        </button>
+      </div>
+
+      <div class="demo-grid">
+        <article class="demo-card">
+          <h4>Subject</h4>
+          <p>Only active subscribers receive emitted values.</p>
+          <button type="button" class="primary-btn" (click)="emitSubjectMessage()">
+            Emit Subject value
+          </button>
+          <ul>
+            <li *ngFor="let item of subjectLog">{{ item }}</li>
+          </ul>
+        </article>
+
+        <article class="demo-card">
+          <h4>BehaviorSubject</h4>
+          <p>Emits the current value immediately to new subscribers.</p>
+          <button type="button" class="primary-btn" (click)="emitBehaviorMessage()">
+            Emit BehaviorSubject value
+          </button>
+          <ul>
+            <li *ngFor="let item of behaviorLog">{{ item }}</li>
+          </ul>
+        </article>
+
+        <article class="demo-card">
+          <h4>ReplaySubject</h4>
+          <p>Replays the last emitted values to new subscribers.</p>
+          <button type="button" class="primary-btn" (click)="emitReplayMessage()">
+            Emit ReplaySubject value
+          </button>
+          <ul>
+            <li *ngFor="let item of replayLog">{{ item }}</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
     <div *ngIf="customers.length === 0" class="empty-state">
       No customers found.
     </div>
@@ -28,7 +75,7 @@
         </thead>
 
         <tbody>
-          @for (customer of paginatedCustomers; track $index) {
+          @for (customer of customers; track $index) {
             <tr>
               <td>{{ customer.firstName || "—" }}</td>
               <td>{{ customer.lastName || "—" }}</td>

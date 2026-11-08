@@ -32,18 +32,11 @@ namespace CMS.Services.Customers
             });
         }
 
-        public CustomerModel? SearchCustomer(Func<Customer, bool> customerSearchQuery)
+        public Customer? SearchCustomer(Func<Customer, bool> customerSearchQuery)
         {
             var customers = repository.GetBySearchParams(customerSearchQuery);
             var customer = customers.FirstOrDefault();
-            return customer == null ? null : new CustomerModel
-            {
-                Id = customer.Id,
-                Dob = customer.Dob,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                MiddleName = customer.MiddleName,
-            };
+            return customer;
         }
 
         public CustomerModel UpdateCustomer(Customer customer)

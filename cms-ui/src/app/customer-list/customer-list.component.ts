@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 
 import { CustomerFormComponent } from '../customer-form/customer-form.component';
 import { Customer, CustomerService } from '../customer.service';
@@ -19,10 +20,19 @@ export class CustomerListComponent implements OnInit {
   formMode: 'create' | 'edit' | 'view' = 'create';
   showForm = false;
 
+  readonly subjectStream = new Subject<string>();
+  readonly behaviorSubjectStream = new BehaviorSubject<string>('Initial value from BehaviorSubject');
+  readonly replaySubjectStream = new ReplaySubject<string>(2);
+
+  subjectLog: string[] = [];
+  behaviorLog: string[] = [];
+  replayLog: string[] = [];
+
   constructor(private readonly customerService: CustomerService) {}
 
   ngOnInit(): void {
     this.loadCustomers();
+    this.subscribeToRealtimeExamples();
   }
 
   get totalPages(): number {
@@ -50,6 +60,41 @@ export class CustomerListComponent implements OnInit {
         this.currentPage = 1;
       },
     });
+  }
+
+  subscribeToRealtimeExamples(): void {
+    this.subjectStream.subscribe((value) => {
+      this.subjectLog = [...this.subjectLog, `Subject -> ${value}`];
+    });
+
+    this.behaviorSubjectStream.subscribe((value) => {
+      this.behaviorLog = [...this.behaviorLog, `BehaviorSubject -> ${value}`];
+    });
+
+    this.replaySubjectStream.subscribe((value) => {
+      this.replayLog = [...this.replayLog, `ReplaySubject -> ${value}`];
+    });
+  }
+
+  emitSubjectMessage(): void {
+    const message = `Subject event at ${new Date().toLocaleTimeString()}`;
+    this.subjectStream.next(message);
+  }
+
+  emitBehaviorMessage(): void {
+    const message = `BehaviorSubject event at ${new Date().toLocaleTimeString()}`;
+    this.behaviorSubjectStream.next(message);
+  }
+
+  emitReplayMessage(): void {
+    const message = `ReplaySubject event at ${new Date().toLocaleTimeString()}`;
+    this.replaySubjectStream.next(message);
+  }
+
+  clearRealtimeLogs(): void {
+    this.subjectLog = [];
+    this.behaviorLog = [];
+    this.replayLog = [];
   }
 
   goToPage(pageNumber: number): void {

@@ -50,6 +50,9 @@ namespace CMS.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerModel), Description = "Returns the updated customer")]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(StatusCodeResult), Description = "Returns a not found status code")]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(StatusCodeResult), Description = "Returns an error status code")]
         public IActionResult UpdateCustomer([FromRoute] int id, [FromBody] CustomerModel customerModel)
         {
             try
