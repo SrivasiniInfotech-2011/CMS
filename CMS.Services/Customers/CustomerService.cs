@@ -8,48 +8,35 @@ namespace CMS.Services.Customers
     {
         public CustomerModel AddCustomer(Customer customer)
         {
-            customer=repository.Add(customer);
-            return new CustomerModel
-            {
-                Id= customer.Id,
-                Dob = customer.Dob,
-                FirstName=customer.FirstName,
-                LastName=customer.LastName,
-                MiddleName = customer.MiddleName,
-            };
+            customer = repository.Add(customer);
+            return ToModel(customer);
         }
 
         public IEnumerable<CustomerModel> GetAllCustomers()
         {
-            var customers = repository.GetAll();
-            return customers.Select(customer => new CustomerModel
-            {
-                Id = customer.Id,
-                Dob = customer.Dob,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                MiddleName = customer.MiddleName,
-            });
+            return repository.GetAll().Select(ToModel);
         }
 
         public Customer? SearchCustomer(Func<Customer, bool> customerSearchQuery)
         {
             var customers = repository.GetBySearchParams(customerSearchQuery);
-            var customer = customers.FirstOrDefault();
-            return customer;
+            return customers.FirstOrDefault();
         }
 
         public CustomerModel UpdateCustomer(Customer customer)
         {
             customer = repository.Update(customer);
-            return new CustomerModel
-            {
-                Id = customer.Id,
-                Dob = customer.Dob,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                MiddleName = customer.MiddleName,
-            };
+            return ToModel(customer);
         }
+
+        private static CustomerModel ToModel(Customer customer) => new()
+        {
+            Id = customer.Id,
+            Dob = customer.Dob,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
+            MiddleName = customer.MiddleName,
+            ImageUrl = customer.ImageBlobName == null ? null : $"/api/Customer/{customer.Id}/image"
+        };
     }
 }

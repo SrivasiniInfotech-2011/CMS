@@ -41,6 +41,11 @@ namespace CMS.Repository.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("FirstName");
 
+                    b.Property<string>("ImageBlobName")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("ImageBlobName");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)

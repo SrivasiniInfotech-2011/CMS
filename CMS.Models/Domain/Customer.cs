@@ -7,4 +7,5 @@ public class CustomerModel
     public string LastName { get; set; }
     public string MiddleName { get; set; }
     public DateTime? Dob { get; set; }
+    public string? ImageUrl { get; set; }
 }

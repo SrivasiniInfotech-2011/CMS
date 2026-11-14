@@ -2,6 +2,8 @@ using CMS.Repository.Context;
 using CMS.Repository.Repositories;
 using CMS.Services.CustomerOrders;
 using CMS.Services.Customers;
+using CMS.Services.Storage;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -45,7 +47,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -89,6 +91,14 @@ builder.Services.AddSqlServer<CMSDBContext>(configuration.GetConnectionString("C
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerOrderService, CustomerOrderService>();
+
+var blobStorageConnectionString = configuration["BlobStorage:ConnectionString"]
+    ?? throw new InvalidOperationException("BlobStorage:ConnectionString must be configured.");
+var blobContainerName = configuration["BlobStorage:ContainerName"] ?? "customer-images";
+builder.Services.AddSingleton(new BlobServiceClient(blobStorageConnectionString));
+builder.Services.AddSingleton(serviceProvider =>
+    serviceProvider.GetRequiredService<BlobServiceClient>().GetBlobContainerClient(blobContainerName));
+builder.Services.AddScoped<ICustomerImageStorage, CustomerImageStorage>();
 
 var app = builder.Build();
 

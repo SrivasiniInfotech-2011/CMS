@@ -33,6 +33,9 @@ public class CMSDBContext(DbContextOptions<CMSDBContext> options) : DbContext(op
             prop.Property(p => p.Dob)
                 .HasColumnType("DateTime")
                 .HasColumnName("Dob");
+            prop.Property(p => p.ImageBlobName)
+                .HasMaxLength(512)
+                .HasColumnName("ImageBlobName");
         });
         modelBuilder.Entity<Customer>()
                     .HasMany<Order>(customer => customer.Orders)

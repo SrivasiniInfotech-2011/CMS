@@ -7,6 +7,7 @@ public class Customer
     public string LastName { get; set; }
     public string MiddleName { get; set; }
     public DateTime? Dob { get; set; }
+    public string? ImageBlobName { get; set; }
     public virtual IEnumerable<Order> Orders { get; set; }
 
 }

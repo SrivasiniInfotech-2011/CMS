@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import { Customer, CustomerService } from '../customer.service';
 
@@ -11,7 +13,7 @@ import { Customer, CustomerService } from '../customer.service';
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.scss',
 })
-export class CustomerFormComponent implements OnChanges {
+export class CustomerFormComponent implements OnChanges, OnDestroy {
   @Input() customer: Customer | null = null;
   @Input() mode: 'create' | 'edit' | 'view' = 'create';
   @Output() saved = new EventEmitter<void>();
@@ -19,6 +21,10 @@ export class CustomerFormComponent implements OnChanges {
 
   customerForm: FormGroup;
   isSaving = false;
+  customerImage: File | null = null;
+  imagePreviewUrl: string | null = null;
+  imageError = '';
+  saveError = '';
 
   constructor(
     private readonly fb: FormBuilder,
@@ -34,6 +40,8 @@ export class CustomerFormComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['customer'] || changes['mode']) {
+      this.clearSelectedImage();
+
       if (this.customer) {
         this.customerForm.patchValue({
           firstName: this.customer.firstName ?? '',
@@ -58,6 +66,45 @@ export class CustomerFormComponent implements OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.revokeImagePreview();
+  }
+
+  openImagePicker(fileInput: HTMLInputElement): void {
+    if (this.mode !== 'view') {
+      fileInput.click();
+    }
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.clearSelectedImage();
+      this.imageError = 'Choose a JPEG, PNG, or WebP image.';
+      input.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.clearSelectedImage();
+      this.imageError = 'The image must be 5 MB or smaller.';
+      input.value = '';
+      return;
+    }
+
+    this.revokeImagePreview();
+    this.customerImage = file;
+    this.imagePreviewUrl = URL.createObjectURL(file);
+    this.imageError = '';
+    this.saveError = '';
+  }
+
   onSubmit(): void {
     if (this.customerForm.invalid || this.mode === 'view') {
       this.customerForm.markAllAsTouched();
@@ -69,20 +116,29 @@ export class CustomerFormComponent implements OnChanges {
       id: this.customer?.id,
     };
 
+    let request$: Observable<Customer>;
+    if (this.mode === 'edit' && this.customer?.id) {
+      request$ = this.customerService.updateCustomer(this.customer.id, payload);
+    } else if (this.mode === 'create' && this.customerImage) {
+      request$ = this.customerService.createCustomer(payload, this.customerImage);
+    } else {
+      this.imageError = 'A customer image is required.';
+      return;
+    }
+
     this.isSaving = true;
-
-    const request$ =
-      this.mode === 'edit' && this.customer?.id
-        ? this.customerService.updateCustomer(this.customer.id, payload)
-        : this.customerService.createCustomer(payload);
-
+    this.saveError = '';
     request$.subscribe({
       next: () => {
         this.isSaving = false;
         this.saved.emit();
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.isSaving = false;
+        this.saveError =
+          typeof error.error === 'string'
+            ? error.error
+            : 'Unable to save the customer. Please try again.';
       },
     });
   }
@@ -95,6 +151,20 @@ export class CustomerFormComponent implements OnChanges {
     if (this.mode === 'view' && this.customer?.id) {
       this.mode = 'edit';
       this.customerForm.enable();
+    }
+  }
+
+  private clearSelectedImage(): void {
+    this.revokeImagePreview();
+    this.customerImage = null;
+    this.imageError = '';
+    this.saveError = '';
+  }
+
+  private revokeImagePreview(): void {
+    if (this.imagePreviewUrl) {
+      URL.revokeObjectURL(this.imagePreviewUrl);
+      this.imagePreviewUrl = null;
     }
   }
 }

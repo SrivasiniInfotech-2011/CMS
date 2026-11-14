@@ -8,6 +8,7 @@ export interface Customer {
   lastName?: string;
   middleName?: string;
   dob?: string | null;
+  imageUrl?: string | null;
 }
 
 @Injectable({
@@ -88,8 +89,17 @@ export class CustomerService {
     });
   }
 
-  createCustomer(customer: Customer): Observable<Customer> {
-    return this.http.post<Customer>(this.apiUrl, customer, {
+  createCustomer(customer: Customer, customerImage: File): Observable<Customer> {
+    const formData = new FormData();
+    formData.append('FirstName', customer.firstName ?? '');
+    formData.append('LastName', customer.lastName ?? '');
+    formData.append('MiddleName', customer.middleName ?? '');
+    if (customer.dob) {
+      formData.append('Dob', customer.dob);
+    }
+    formData.append('customerImage', customerImage, customerImage.name);
+
+    return this.http.post<Customer>(this.apiUrl, formData, {
       headers: this.buildHeaders(),
     });
   }

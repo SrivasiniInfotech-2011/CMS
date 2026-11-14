@@ -11,6 +11,34 @@
   </div>
 
   <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-form">
+    <div *ngIf="mode === 'create'" class="image-upload">
+      <label for="customerImage">Customer Image</label>
+      <input
+        #customerImageInput
+        id="customerImage"
+        class="image-file-input"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        (change)="onImageSelected($event)"
+      />
+      <button
+        type="button"
+        class="image-silhouette"
+        [class.has-image]="imagePreviewUrl"
+        aria-label="Choose a customer image"
+        (click)="openImagePicker(customerImageInput)"
+      >
+        <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl" alt="Customer image preview" />
+        <svg *ngIf="!imagePreviewUrl" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="21" r="13"></circle>
+          <path d="M8 58c1-14 10-22 24-22s23 8 24 22H8z"></path>
+        </svg>
+        <span>{{ imagePreviewUrl ? 'Change image' : 'Add image' }}</span>
+      </button>
+      <small *ngIf="imageError" role="alert">{{ imageError }}</small>
+      <small *ngIf="!imageError">JPEG, PNG, or WebP (5 MB max)</small>
+    </div>
+
     <div class="field-grid">
       <div class="field">
         <label for="firstName">First Name</label>
@@ -41,6 +69,8 @@
         </small>
       </div>
     </div>
+
+    <small *ngIf="saveError" role="alert">{{ saveError }}</small>
 
     <div class="actions">
       <button *ngIf="mode !== 'view'" type="submit" class="primary-btn" [disabled]="isSaving || customerForm.invalid">
